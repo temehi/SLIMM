@@ -76,7 +76,7 @@ struct arg_options
 void setupArgumentParser(ArgumentParser & parser, arg_options const & options)
 {
     // Setup ArgumentParser.
-    setAppName(parser, "slimm-build");
+    setAppName(parser, "slimm_build");
     setShortDescription(parser, "gets a reduced taxonomic information given a multi-fasta file using accession numbers");
     setCategory(parser, "Metagenomics");
 
