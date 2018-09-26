@@ -403,9 +403,9 @@ int main(int argc, char const ** argv)
         uint32_t start = batch_no * batch_download;
         uint32_t end = ((batch_no+1) * batch_download > accessions.size())? accessions.size() : (batch_no+1) * batch_download;
 
-        std::cerr <<"[MSG] Downloading accession xmls  \t" << batch_no+1 << "/" << num_partitions <<"\t..." << std::endl;
+        std::cerr <<"[MSG] Downloading accession xmls  \t" << batch_no+1 << "/" << num_partitions << std::endl;
         download_xml_files(accessions, start, end);
-        std::cerr <<"[MSG] mapping accessions to taxon id \t..." << std::endl;
+        std::cerr <<"[MSG] mapping accessions to taxon id" << std::endl;
         get_taxid_from_accession(slimm_db, accessions, missed_accessions, options, start, end);
 
         remove_xml_files(accessions, start, end);
