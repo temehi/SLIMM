@@ -286,7 +286,7 @@ inline void get_taxid_from_accession(slimm_database & slimm_db,
             }
             else
             {
-                std::cerr << "[" << curr_acc << "] BAD xml file doenloaded from entrez/eutils!" << std::endl;
+                std::cerr << "[" << curr_acc << "] BAD xml file downloaded from entrez/eutils!" << std::endl;
                 missed_accessions.push_back(curr_acc);
             }
         }
@@ -410,6 +410,21 @@ int main(int argc, char const ** argv)
 
         remove_xml_files(accessions, start, end);
     }
+
+    uint32_t missed_count = missed_accessions.size();
+    uint32_t try_number = 1;
+    while(try_number < 11 && missed_count != 0)
+    {
+        std::cerr <<"[MSG] giving "<< missed_count <<" missed accessions another chance ... [try "<<  try_number << "]"<< std::endl;
+        accessions = missed_accessions;
+        missed_accessions.clear();
+        download_xml_files(accessions, 0, missed_count);
+        get_taxid_from_accession(slimm_db, accessions, missed_accessions, options, 0, missed_count);
+        remove_xml_files(accessions, 0, missed_count);
+        ++try_number;
+        missed_count = missed_accessions.size();
+    }
+
 
     // some accessions are still not mapped
     if(missed_accessions.size() > 0)
