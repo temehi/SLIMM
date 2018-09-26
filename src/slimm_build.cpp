@@ -35,6 +35,7 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_map>
+#include <cstdlib>
 
 
 #include <seqan/basic.h>
@@ -54,6 +55,7 @@ using namespace seqan;
 struct arg_options
 {
     uint32_t                     batch;
+    uint32_t                     threads_count;
     bool                         verbose;
     std::string                  fasta_path;
     std::string                  nodes_path;
@@ -62,6 +64,7 @@ struct arg_options
     std::vector<std::string>     ac__taxid_paths;
 
     arg_options() : batch(1000000),
+                    threads_count(20),
                     verbose(false),
                     fasta_path(),
                     nodes_path(),
@@ -106,7 +109,7 @@ void setupArgumentParser(ArgumentParser & parser, arg_options const & options)
                              ArgParseArgument::INPUT_FILE));
     setRequired(parser, "nodes");
 
-    addOption(parser, ArgParseOption("b", "batch", "maximum number of mapping to load to memory. (default=1000000)",
+    addOption(parser, ArgParseOption("b", "batch", "maximum number of mapping to load to memory.",
                              ArgParseArgument::INTEGER, "INT"));
     setDefaultValue(parser, "batch", options.batch);
 
@@ -148,7 +151,7 @@ parseCommandLine(ArgumentParser & parser, arg_options & options, int argc, char 
 // --------------------------------------------------------------------------
 // Function get_accession_numbers()
 // --------------------------------------------------------------------------
-inline void get_accession_numbers(std::set<std::string> & accessions, arg_options const & options)
+inline void get_accession_numbers(std::vector<std::string> & accessions, arg_options const & options)
 {
     std::cerr <<"[MSG] getting accessions numbers from fasta file ...\n";
     CharString id;
@@ -164,7 +167,7 @@ inline void get_accession_numbers(std::set<std::string> & accessions, arg_option
     while(!atEnd(fasta_file))
     {
         readRecord(id, seq, fasta_file);
-        accessions.insert(get_accession_id(id));
+        accessions.push_back(get_accession_id(id));
     }
     close(fasta_file);
 }
@@ -197,7 +200,7 @@ inline bool get_batch_mappings_ac__taxid(std::unordered_map<std::string, uint32_
 // --------------------------------------------------------------------------
 // Function print_missed_accessions()
 // --------------------------------------------------------------------------
-inline void print_missed_accessions(std::set<std::string> & accessions,
+inline void print_missed_accessions(std::vector<std::string> & accessions,
                                     arg_options const & options)
 {
     uint32_t count = 3;
@@ -217,11 +220,125 @@ inline void print_missed_accessions(std::set<std::string> & accessions,
     std::cerr <<"[WARNING!] Take a look at "<< missed_acc_path << " file for a complete list.\n";
     std::cerr <<"[WARNING!] Try including the more ACCESSION2TAXAID MAP FILE (e.g. dead_nucl.accession2taxid)\n";
 }
+
+// --------------------------------------------------------------------------
+// Function get_taxid_from_xml_string()
+// --------------------------------------------------------------------------
+inline int get_taxid_from_xml_string(std::string & xml_str)
+{
+    int tax_id = -1;
+    std::string const taxid_identifier = "<Item Name=\"TaxId\" Type=\"Integer\">";
+    size_t tid_index = xml_str.find(taxid_identifier, 0);
+    if (tid_index < xml_str.length())
+    {
+        size_t tid_begin = tid_index + taxid_identifier.length();
+        size_t tid_end = xml_str.find('<', tid_begin);
+        std::string tid_str = xml_str.substr(tid_begin, tid_end-tid_begin);
+        tax_id = atoi( tid_str.c_str() ) ;
+    }
+    return tax_id;
+}
+// --------------------------------------------------------------------------
+// Function download_xml_files()
+// --------------------------------------------------------------------------
+inline void download_xml_files(std::vector<std::string> & accessions, uint32_t numThr)
+{
+    uint32_t chunk_size = accessions.size()/numThr + 1;
+
+    std::string const url_base = "\"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=nuccore&id=";
+
+    std::vector<std::future<void>> tasks;
+
+    for (uint32_t taskNo = 0; taskNo < numThr; ++taskNo)
+    {
+        tasks.emplace_back(std::async([=, &accessions, &url_base] {
+            for (uint32_t i = taskNo*chunk_size; i < accessions.size() && i < (taskNo +1)*chunk_size; ++i)
+            {
+                std::string cmd = "curl -s " + url_base + accessions[i] +"\" > " + accessions[i] +".xml";
+                int download_attempts = 0;
+                int download_res = 1;
+                while (download_attempts < 10 && download_res == 1)
+                {
+                    download_res = std::system(cmd.c_str());
+                }
+            }
+        }));
+    }
+    for (auto &&task : tasks)
+    {
+        task.get();
+    }
+}
+
+
+// --------------------------------------------------------------------------
+// Function get_taxid_from_accession_online()
+// --------------------------------------------------------------------------
+inline void get_taxid_from_accession_online(slimm_database & slimm_db,
+                                     std::vector<std::string> & accessions,
+                                     arg_options const & options)
+{
+    std::cerr <<"[MSG] mapping accessions to taxaid ...\n";
+    std::vector<std::string> missed_accessions;
+    // iterate over multiple files
+
+    std::cerr <<"[MSG] Downloading accession xmls ...\n";
+    download_xml_files(accessions, options.threads_count);
+    std::cerr <<"[MSG] Finished Downloading accession xmls ...\n";
+
+    size_t acc_count = accessions.size();
+    size_t count = 1;
+
+    for(auto ac_it=accessions.begin(); ac_it != accessions.end(); ++ac_it)
+    {
+        if (options.verbose)
+        {
+            std::cout << "[" <<*ac_it << "]\t" << count << " of " << acc_count << std::endl;
+        }
+        std::ifstream info_xml_stream(*ac_it + ".xml");
+        if (info_xml_stream)
+        {
+            std::string xml_str((std::istreambuf_iterator<char>(info_xml_stream)),
+                            std::istreambuf_iterator<char>());
+            int taxa_id = get_taxid_from_xml_string(xml_str);
+            if (taxa_id != -1)
+            {
+                slimm_db.ac__taxid[*ac_it] = std::vector<uint32_t>(LINAGE_LENGTH, 0);
+                slimm_db.ac__taxid[*ac_it][0] = taxa_id;
+            }
+            else
+            {
+                if (options.verbose)
+                {
+                    std::cerr << "[" <<*ac_it << "] BAD xml file doenloaded from entrez/eutils!" << std::endl;
+                }
+                missed_accessions.push_back(*ac_it);
+            }
+        }
+        else
+        {
+            if (options.verbose)
+            {
+                std::cerr << "[" <<*ac_it << "] unable to use the entrez/eutils online service!" << std::endl;
+            }
+            missed_accessions.push_back(*ac_it);
+        }
+        info_xml_stream.close();
+        std::string cmd = "rm -rf " + *ac_it +".xml";
+        std::system(cmd.c_str());
+        ++count;
+    }
+
+    // some accessions are still not mapped
+    if(missed_accessions.size() > 0)
+        print_missed_accessions(missed_accessions, options);
+}
+
 // --------------------------------------------------------------------------
 // Function get_taxid_from_accession()
 // --------------------------------------------------------------------------
 inline void get_taxid_from_accession(slimm_database & slimm_db,
-                                     std::set<std::string> & accessions,
+                                     std::vector<std::string> & accessions,
                                      arg_options const & options)
 {
 
@@ -364,12 +481,13 @@ int main(int argc, char const ** argv)
         return res == ArgumentParser::PARSE_ERROR;
 
     // get the accession numbers from the fasta file
-    std::set<std::string> accessions;
+    std::vector<std::string> accessions;
     get_accession_numbers(accessions, options);
 
     slimm_database slimm_db;
     // get the taxid from accession numbers
-    get_taxid_from_accession(slimm_db, accessions, options);
+    get_taxid_from_accession_online(slimm_db, accessions, options);
+//    get_taxid_from_accession(slimm_db, accessions, options);
     fill_name_taxid_linage(slimm_db, options);
     save_slimm_database(slimm_db, options.output_path);
 
