@@ -217,7 +217,7 @@ inline void download_xml_files(std::vector<std::string> & accessions, uint32_t c
         tasks.emplace_back(std::async([=, &accessions, &url_base] {
             for (uint32_t i = task_no*chunk_size; i < batch_size && i < (task_no +1)*chunk_size; ++i)
             {
-                std::string cmd = "curl -s " + url_base + accessions[i] +"\" > " + accessions[i+start] +".xml";
+                std::string cmd = "curl -s " + url_base + accessions[i+start] +"\" > " + accessions[i+start] +".xml";
                 int download_attempts = 0;
                 int download_res = 1;
                 while (download_attempts < max_download_attempts && download_res == 1)
@@ -395,7 +395,7 @@ int main(int argc, char const ** argv)
     if (num_partitions * batch_download != accessions.size())
         num_partitions ++;
 
-    std::cout << "[MSG] " << accessions.size()  << " accession found! -- organized into " << num_partitions << " partitions!" << std::endl;
+    std::cout << "[MSG] " << accessions.size()  << " accessions found! -- organized into " << num_partitions << " partitions!" << std::endl;
 
     for (uint32_t batch_no = 0; batch_no < num_partitions; ++batch_no)
     {
