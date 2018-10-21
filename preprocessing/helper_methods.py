@@ -63,12 +63,15 @@ def taxonomy_download(taxa_type, working_dir, today_string):
     taxa_folder_path = working_dir + "/" + taxa_type + "_" + today_string
     new_file_path = taxa_folder_path + ".tar.gz"
     print "Downloading " + taxa_type + " file ..."
+    print "From: ftp://ftp.ncbi.nih.gov/pub/taxonomy/" + taxa_type + ".tar.gz"
 
     # DELETE FOR TESTING ONLY
     # old_taxa_folder_path = working_dir + "/.old/" + taxa_type + "_" + today_string
     # shutil.copytree(old_taxa_folder_path, taxa_folder_path)
+
     urllib.urlretrieve("ftp://ftp.ncbi.nih.gov/pub/taxonomy/" + taxa_type + ".tar.gz", new_file_path)
     extract_then_delete(new_file_path, taxa_folder_path)
+    urllib.urlcleanup()
     return taxa_folder_path
 
 def download_one(download_queue, genomes_dir):
@@ -76,8 +79,14 @@ def download_one(download_queue, genomes_dir):
     try:
         taxa_id = q[0]
         url = q[1]
-        destination = genomes_dir + "/" + str(taxa_id) + ".fna.gz"
+        destination = genomes_dir + "/" + str(taxa_id)
         urllib.urlretrieve(url, destination)
     except Exception, e:
         download_queue.put(q)
+
+def has_valid_genome_type(genome_line, valid_assembly_levels):
+    for v_type in valid_assembly_levels:
+        if  (v_type in genome_line):
+            return True
+    return False
 
