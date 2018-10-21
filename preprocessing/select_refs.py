@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser(description =
 ''' Download reference genomes of microorganisms
 ''', formatter_class=argparse.RawTextHelpFormatter)
 
-parser.add_argument('-wd', '--work_dir', type=str, required=True,
+parser.add_argument('-o', '--output_dir', type=str, required=True,
                     help = 'The path of working directory where (intermediate) results will be saved')
 parser.add_argument('-g', '--groups',  type=str, default = "AB",
                     help = '''Which group of microbes to consider any combination of the letters [A], [B] and [V]
@@ -24,24 +24,13 @@ parser.add_argument('-d', '--database', type=str, choices = ['refseq', 'genbank'
 
 args = parser.parse_args()
 
-parallel = args.threads
-working_dir = args.workdir
+output_dir = args.output_dir
 groups = args.groups
 only_species = args.species_lv
 only_complete = args.complete
 db_choice = args.database
 taxid_list = args.taxa_ids
 
-
-##############################################################################
-# For KNIME workflow only
-##############################################################################
-# parallel        = flow_variables['threads']
-# working_dir     = flow_variables['workdir']
-# groups          = flow_variables['groups']
-# only_species    = flow_variables['species_lv']
-# db_choice       = flow_variables['database']
-# testing         = flow_variables['testing']
 
 subset_taxids   = []
 if len(taxid_list) >= 1:
@@ -53,20 +42,20 @@ if len(groups_name) < 1:
 elif len(subset_taxids) >= 1:
     groups_name += "_CUSTOM"
 
-if not os.path.isdir(working_dir):
-    os.makedirs(working_dir)
+if not os.path.isdir(output_dir):
+    os.makedirs(output_dir)
 # else:
-#     empty = os.listdir(working_dir) == [];
+#     empty = os.listdir(output_dir) == [];
 #     if not empty:
-#         print ("[ERROR!] Working directory [" + working_dir + "] should be empty!")
+#         print ("[ERROR!] Working directory [" + output_dir + "] should be empty!")
 #         sys.exit(0)
 
 today_string = (datetime.datetime.now()).strftime("%d%m%Y")
-genomes_dir = working_dir + "/genomes_" + today_string
+genomes_dir = output_dir + "/genomes_" + today_string
 if not os.path.isdir(genomes_dir):
     os.makedirs(genomes_dir)
 
-slimmDB_dir = working_dir + "/slimmDB_" + today_string
+slimmDB_dir = output_dir + "/slimmDB_" + today_string
 if not os.path.isdir(slimmDB_dir):
     os.makedirs(slimmDB_dir)
 
@@ -74,8 +63,8 @@ if not os.path.isdir(slimmDB_dir):
 # Get the path of Names, nodes, catagories file from the extracted folder
 ##############################################################################
 
-taxdmp_extract_dir = taxonomy_download("taxdump", working_dir, today_string)
-taxcat_extract_dir = taxonomy_download("taxcat", working_dir, today_string)
+taxdmp_extract_dir = taxonomy_download("taxdump", output_dir, today_string)
+taxcat_extract_dir = taxonomy_download("taxcat", output_dir, today_string)
 
 
 names_path = taxdmp_extract_dir + "/names.dmp"
@@ -90,10 +79,10 @@ assembly_summary_url = "ftp://ftp.ncbi.nlm.nih.gov/genomes/refseq/assembly_summa
 if db_choice == "genbank":
     assembly_summary_url = "ftp://ftp.ncbi.nlm.nih.gov/genomes/ASSEMBLY_REPORTS/assembly_summary_genbank.txt"
 
-assembly_summary_file = working_dir + "/assembly_summary_" + db_choice + "_" + today_string + ".txt"
+assembly_summary_file = output_dir + "/assembly_summary_" + db_choice + "_" + today_string + ".txt"
 
-genomes_to_download_path = working_dir + "/" + groups_name + "_genomes_to_download.txt"
-ncbi_get_script_path =  working_dir + "/" + groups_name + "_genomes_ncbi_download.sh"
+genomes_to_download_path = output_dir + "/" + groups_name + "_genomes_to_download.txt"
+ncbi_get_script_path =  output_dir + "/" + groups_name + "_genomes_ncbi_download.sh"
 
 print "Downloading assembly_summary file ..."
 print assembly_summary_url
