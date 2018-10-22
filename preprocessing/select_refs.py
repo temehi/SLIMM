@@ -159,6 +159,6 @@ for g in organism_group_count:
     total_count += organism_group_count[g]
     detail_count += g + " = " + str (organism_group_count[g]) + ", "
 print str(total_count) + " Genomes matching the criteria were found!"
-print "(" + detail_count + ")"
+print "(" + detail_count[:len(detail_count)-2] + ")"
 print "Their FTP path for downloading them are written at:"
 print selected_genomes_tsv_path
