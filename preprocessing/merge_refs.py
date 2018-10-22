@@ -79,7 +79,7 @@ for fna_file_name in to_merge:
             if line_len == 0:
                 line_len = len(line) -1
     print "added " + fasta_file + "[" + str(global_count) + "/" + str(len(to_merge)) + "]"
-    print str(count) + " seqs\t", plasmid_count ,"plasmids\tall seqs writeen delimated by aline of N's. all_plasmids are ignored"
+    print str(count) + " sequences\t", plasmid_count ,"plasmids.\tAll sequences are written delimited by a line of N's. All plasmids are removed."
     inpf.close()
 outf.close()
 print "merged file written to " + output_file
