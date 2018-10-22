@@ -81,8 +81,10 @@ def download_one(download_queue, genomes_dir):
         url = q[1]
         destination = genomes_dir + "/" + str(taxa_id)
         urllib.urlretrieve(url, destination)
+        urllib.urlcleanup()
     except Exception, e:
         download_queue.put(q)
+        print "retrying with " + q[1]
 
 def has_valid_genome_type(genome_line, valid_assembly_levels):
     for v_type in valid_assembly_levels:
