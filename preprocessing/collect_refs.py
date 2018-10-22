@@ -76,7 +76,7 @@ for fna_file_name in to_download:
 
 total_to_download = download_queue.qsize()
 while not download_queue.empty():
-    if threading.activeCount() <= threads:
+    if threading.activeCount() <= threads and not download_queue.empty():
         threading.Thread(target=download_one, args=(download_queue, output_dir)).start()
         sys.stdout.write('\r')
         sys.stdout.write("%d of %d remaining ..." % (download_queue.qsize(), total_to_download))
