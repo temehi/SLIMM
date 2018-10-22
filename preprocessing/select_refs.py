@@ -45,7 +45,7 @@ elif len(subset_taxids) >= 1:
 if not os.path.isdir(output_dir):
     os.makedirs(output_dir)
 
-today_string = (datetime.datetime.now()).strftime("%d%m%Y")
+today_string = (datetime.datetime.now()).strftime("%Y%m%d")
 
 taxid_col = 5
 if only_species :
