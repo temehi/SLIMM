@@ -36,35 +36,32 @@ subset_taxids   = []
 if len(taxid_list) >= 1:
     subset_taxids   = map(int, taxid_list.split(','))
 
-groups_name     = groups
-if len(groups_name) < 1:
-    groups_name = "CUSTOM"
-elif len(subset_taxids) >= 1:
-    groups_name += "_CUSTOM"
-
 if not os.path.isdir(output_dir):
     os.makedirs(output_dir)
 
 today_string = (datetime.datetime.now()).strftime("%Y%m%d")
-
+sp_string = "ST"
 taxid_col = 5
 if only_species :
     taxid_col = 6
+    sp_string = "SP"
 
-taxid_genomes =  {}
+complete_string = "ALL"
 valid_assembly_levels=["Complete Genome"]
 if only_complete:
+    complete_string = "CMP"
     print "Downloading only complete genomes ..."
 else:
     valid_assembly_levels = ["Complete Genome", "Chromosome", "Scaffold", "Contig"]
 
+taxid_genomes =  {}
 for g in groups:
     ################################################################################################
     # Get the assembly file for the current specified group.
     # If a file exists from the same day skip downloading.
     ################################################################################################
     assembly_summary_url = "ftp://ftp.ncbi.nlm.nih.gov/genomes/" + db_choice + "/" + organism_group[g] + "/assembly_summary.txt"
-    assembly_summary_file = output_dir + "/" + g +"_assembly_summary_" + db_choice + "_" + today_string + ".txt"
+    assembly_summary_file = output_dir + "/" + organism_group[g] + "_assembly_summary_" + db_choice + "_" + today_string + ".txt"
     if (os.path.isfile(assembly_summary_file) ) :
         print "Using an existing assembly_summary file ..."
         print assembly_summary_file
@@ -116,7 +113,7 @@ for g in groups:
 ################################################################################################
 # Write the selected genomes to file
 ################################################################################################
-selected_genomes_tsv_path = output_dir + "/" + groups_name + "_" + db_choice + "_selected_genomes.tsv"
+selected_genomes_tsv_path = output_dir + "/" + groups + "_" + sp_string + "_" + complete_string  + "_" + db_choice + "_selected_genomes.tsv"
 outf = open(selected_genomes_tsv_path, 'w')
 organism_group_count = {'archaea':0, 'bacteria':0, 'viral':0, 'fungi':0}
 smallest_date = "0001/01/01"
