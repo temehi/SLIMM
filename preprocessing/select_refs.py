@@ -104,10 +104,10 @@ for g in groups:
                 ftp_path = path  #[5]
                 fna_file_name = path[path.rfind('/')+1:] + "_genomic.fna.gz" #[6]
                 if taxid in taxid_genomes :
-                    taxid_genomes[taxid].append([refseq_category, species_taxid, assembly_level, genome_rep, seq_rel_date, ftp_path, fna_file_name, organism_group[g]])
+                    taxid_genomes[taxid].append([refseq_category, species_taxid, assembly_level, genome_rep, seq_rel_date, ftp_path, fna_file_name, g])
                 else:
                     taxid_genomes[taxid] = []
-                    taxid_genomes[taxid].append([refseq_category, species_taxid, assembly_level, genome_rep, seq_rel_date, ftp_path, fna_file_name, organism_group[g]])
+                    taxid_genomes[taxid].append([refseq_category, species_taxid, assembly_level, genome_rep, seq_rel_date, ftp_path, fna_file_name, g])
     inpf.close()
 
 ################################################################################################
