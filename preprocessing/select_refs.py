@@ -61,7 +61,7 @@ for g in groups:
     # If a file exists from the same day skip downloading.
     ################################################################################################
     assembly_summary_url = "ftp://ftp.ncbi.nlm.nih.gov/genomes/" + db_choice + "/" + organism_group[g] + "/assembly_summary.txt"
-    assembly_summary_file = output_dir + "/" + organism_group[g] + "_assembly_summary_" + db_choice + "_" + today_string + ".txt"
+    assembly_summary_file = output_dir + "/assembly_summary_" + db_choice + "_"  + organism_group[g] + "_" + today_string + ".txt"
     if (os.path.isfile(assembly_summary_file) ) :
         print "Using an existing assembly_summary file ..."
         print assembly_summary_file
@@ -111,11 +111,12 @@ for g in groups:
     inpf.close()
 
 ################################################################################################
-# Write the selected genomes to file
+# Write the selected genomes to file  select_refs_refseq_SP_ALL_B.log
 ################################################################################################
-selected_genomes_tsv_path = output_dir + "/" + groups + "_" + sp_string + "_" + complete_string  + "_" + db_choice + "_selected_genomes.tsv"
+selected_genomes_tsv_path = output_dir + "/selected_refs_" + db_choice + "_" + sp_string + "_" + complete_string + "_" + groups  + ".tsv"
 outf = open(selected_genomes_tsv_path, 'w')
-organism_group_count = {'archaea':0, 'bacteria':0, 'viral':0, 'fungi':0}
+
+organism_group_count = {'A':0, 'B':0, 'V':0, 'F':0}
 smallest_date = "0001/01/01"
 for taxid in taxid_genomes:
     found = False
@@ -152,9 +153,9 @@ outf.close()
 
 detail_count = ""
 total_count = 0
-for g in organism_group_count:
+for g in groups:
     total_count += organism_group_count[g]
-    detail_count += g + " = " + str (organism_group_count[g]) + ", "
+    detail_count += g + " = " + str (organism_group[g]) + ", "
 print str(total_count) + " Genomes matching the criteria were found!"
 print "(" + detail_count[:len(detail_count)-2] + ")"
 print "Their FTP path for downloading them are written at:"
