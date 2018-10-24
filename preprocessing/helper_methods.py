@@ -87,7 +87,8 @@ def download_one(download_queue, genomes_dir):
         print "retrying with " + q[1]
 
 def has_valid_genome_type(genome_line, valid_assembly_levels):
-    for v_type in valid_assembly_levels:
+    v_levels = ["reference genome", "representative genome"] + valid_assembly_levels
+    for v_type in v_levels:
         if  (v_type in genome_line):
             return True
     return False

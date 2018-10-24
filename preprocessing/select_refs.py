@@ -39,7 +39,6 @@ if len(taxid_list) >= 1:
 if not os.path.isdir(output_dir):
     os.makedirs(output_dir)
 
-today_string = (datetime.datetime.now()).strftime("%Y%m%d")
 sp_string = "ST"
 taxid_col = 5
 if only_species :
@@ -61,20 +60,21 @@ for g in groups:
     # If a file exists from the same day skip downloading.
     ################################################################################################
     assembly_summary_url = "ftp://ftp.ncbi.nlm.nih.gov/genomes/" + db_choice + "/" + organism_group[g] + "/assembly_summary.txt"
-    assembly_summary_file = output_dir + "/assembly_summary_" + db_choice + "_"  + organism_group[g] + "_" + today_string + ".txt"
+    assembly_summary_file = output_dir + "/assembly_summary_" + db_choice + "_"  + organism_group[g] + ".txt"
     if (os.path.isfile(assembly_summary_file) ) :
         print "Using an existing assembly_summary file ..."
         print assembly_summary_file
+        print "[WARNING] delete this file if you want to update to a new set of assemblies!"
     else:
         print "Downloading assembly_summary file ..."
         print assembly_summary_url
         urllib.urlretrieve(assembly_summary_url, assembly_summary_file)
-    ################################################################################################
+    ############################################################################################
     # From the assembly summary file, identify the genomes to download based on criterion given.
     # Unique genomes per taxon will be downloaded. Genomes are selected in the following order:
     # 1. Complete genomes (longest first)
     # 2. Chromosomes (longest first)
-    ################################################################################################
+    ############################################################################################
     # 0   # assembly_accession          # 11  assembly_level
     # 1   bioproject                    # 12  release_type
     # 2   biosample                     # 13  genome_rep
