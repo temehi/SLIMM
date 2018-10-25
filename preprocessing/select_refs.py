@@ -13,7 +13,7 @@ parser.add_argument('-g', '--groups',  type=str, default = "AB",
 parser.add_argument('-s', '--species_only', dest='species_lv', action='store_true',
                     help = 'download one reference per species.')
 parser.add_argument('-c', '--complete', dest='complete', action='store_true',
-                    help = 'download only complete genomes.')
+                    help = 'download only complete genomes (includes chromosome level assembly)')
 parser.add_argument('-t', '--taxa_ids',  type=str, default = "",
                     help = '''comma separated list of taxonomic ids to be included (in addition to --groups) into
                                 the reference database. This way you might even add the genome of Eukaryotes.
@@ -46,7 +46,7 @@ if only_species :
     sp_string = "SP"
 
 complete_string = "ALL"
-valid_assembly_levels=["Complete Genome"]
+valid_assembly_levels=["Complete Genome", "Chromosome"]
 if only_complete:
     complete_string = "CMP"
     print "Downloading only complete genomes ..."

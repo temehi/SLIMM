@@ -25,7 +25,6 @@ def extract_then_delete(source, destination):
     os.remove(source)
 
 
-
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.
 
@@ -87,8 +86,7 @@ def download_one(download_queue, genomes_dir):
         print "retrying with " + q[1]
 
 def has_valid_genome_type(genome_line, valid_assembly_levels):
-    v_levels = ["reference genome", "representative genome"] + valid_assembly_levels
-    for v_type in v_levels:
+    for v_type in valid_assembly_levels:
         if  (v_type in genome_line):
             return True
     return False
