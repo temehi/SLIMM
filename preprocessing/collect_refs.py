@@ -2,7 +2,7 @@
 from helper_methods import *
 
 parser = argparse.ArgumentParser(
-    description='Download reference genomes using a list compiled by select_refs.py ')
+    description='Download reference genomes using a list compiled by select_refs.py.')
 
 parser.add_argument('-t', '--tsv_file', type=str, required=True,
                     help = 'Path to a TSV file containing genomes to download and their corresponding FTP path. '

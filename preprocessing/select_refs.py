@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 from helper_methods import *
 
-parser = argparse.ArgumentParser(description='Selects microbial reference genomes (assemblies) to'
-    ' download based on various criteria. (NB. This script does not download the actual FASTA files.'
-    ' Instead it simply identifies a set of genomes/assemblies and their corresponding download locations. )')
+parser = argparse.ArgumentParser(
+    description='Selects microbial reference genomes (assemblies) to download based on '
+        'various criteria. (NB. This script does not download the actual FASTA files. '
+        'Instead it simply identifies a set of genomes/assemblies and their '
+        'corresponding download locations.)')
 parser.add_argument('-g', '--groups',  type=str, default = "AB",
                     help = 'Which group of microbes to consider any combination of the letters '
                     '[A], [B], [V] and [F] where B =  Bacteria, A = Archaea and '
