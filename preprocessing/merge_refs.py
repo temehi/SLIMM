@@ -5,18 +5,18 @@ import os
 import re
 import gzip
 
-parser = argparse.ArgumentParser(description =
-''' Merge downloaded reference genomes in to one single fasta file.
-Contigs will be delimited by a sequence of NNNs
-''', formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser(
+    description ='Merge downloaded reference genomes in to one single FASTA file. '
+                 'Contigs will be delimited by a sequence of NNNs')
 
-parser.add_argument('-i', '--input_dir', type=str, required=True,
-                    help = 'The path of directory where fasta files are located')
-parser.add_argument('-o', '--output_file', type=str, required=True,
-                    help = 'The path of to the merged output file')
 parser.add_argument('-t', '--tsv_file', type=str, required=True,
-                    help = '''tsv files containing taxas to download and their corresponding FTP path.
-                                a result from running select_refs.py''')
+                    help = 'Path to a TSV file containing genomes to download and their corresponding FTP path. '
+                            '(a result from running select_refs.py)')
+parser.add_argument('-i', '--input_dir', type=str, required=True,
+                    help = 'Path to directory containing downloaded FASTA files. '
+                            '(a result from running collect_refs.py)')
+parser.add_argument('-o', '--output_file', type=str, required=True,
+                    help = 'Path to the new merged multi FASTA file.')
 
 
 args = parser.parse_args()

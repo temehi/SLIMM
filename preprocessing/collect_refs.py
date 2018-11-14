@@ -1,20 +1,19 @@
 #!/usr/bin/env python
 from helper_methods import *
 
-parser = argparse.ArgumentParser(description =
-''' Download reference genomes using a list provided by select_refs.py
-''', formatter_class=argparse.RawTextHelpFormatter)
+parser = argparse.ArgumentParser(
+    description='Download reference genomes using a list compiled by select_refs.py ')
 
-parser.add_argument('-o', '--output_dir', type=str, required=True,
-                    help = 'The path of working directory where (intermediate) results will be saved')
 parser.add_argument('-t', '--tsv_file', type=str, required=True,
-                    help = '''tsv files containing taxas to download and their corresponding FTP path.
-                                a result from running select_refs.py''')
-parser.add_argument('-bd', '--buffer_dir', type=str, default = "",
-                    help = '''directory containing already downloaded files to avoid repetitive downloads.
-                                Symbolic link will be created to already existing files in this directory''')
+                    help = 'Path to a TSV file containing genomes to download and their corresponding FTP path. '
+                            '(a result from running select_refs.py)')
 parser.add_argument('-tr', '--threads',  type=int, choices=xrange(1, 11), default = 1,
                     help = 'number of threads for downloading in parallel in the range 1..10 (default: 1)')
+parser.add_argument('-bd', '--buffer_dir', type=str, default = "",
+                    help = 'directory containing already downloaded files to avoid repetitive downloads. '
+                            'Symbolic link will be created to already existing files in this directory')
+parser.add_argument('-o', '--output_dir', type=str, required=True,
+                    help = 'Path of a directory where (intermediate) results will be saved')
 
 
 args = parser.parse_args()

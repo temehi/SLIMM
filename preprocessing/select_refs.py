@@ -1,25 +1,25 @@
 #!/usr/bin/env python
 from helper_methods import *
 
-parser = argparse.ArgumentParser(description =
-''' Download reference genomes of microorganisms
-''', formatter_class=argparse.RawTextHelpFormatter)
-
-parser.add_argument('-o', '--output_dir', type=str, required=True,
-                    help = 'The path of working directory where (intermediate) results will be saved')
+parser = argparse.ArgumentParser(description='Selects microbial reference genomes (assemblies) to'
+    ' download based on various criteria. (NB. This script does not download the actual FASTA files.'
+    ' Instead it simply identifies a set of genomes/assemblies and their corresponding download locations. )')
 parser.add_argument('-g', '--groups',  type=str, default = "AB",
-                    help = '''Which group of microbes to consider any combination of the letters [A], [B], [V] and [F]
-                                where B =  Bacteria, A = Archaea and V = Viruses and Viroids (default: AB)''')
+                    help = 'Which group of microbes to consider any combination of the letters '
+                    '[A], [B], [V] and [F] where B =  Bacteria, A = Archaea and '
+                    'V = Viruses and Viroids (default: AB)')
 parser.add_argument('-s', '--species_only', dest='species_lv', action='store_true',
                     help = 'download one reference per species.')
 parser.add_argument('-c', '--complete', dest='complete', action='store_true',
                     help = 'download only complete genomes (includes chromosome level assembly)')
 parser.add_argument('-t', '--taxa_ids',  type=str, default = "",
-                    help = '''comma separated list of taxonomic ids to be included (in addition to --groups) into
-                                the reference database. This way you might even add the genome of Eukaryotes.
-                                 e.g. the host genome''')
+                    help =  'comma separated list of taxonomic ids to be included (in addition to --groups) into '
+                            'the reference database. This way you might even add the genome of Eukaryotes. '
+                            'e.g. the host genome')
 parser.add_argument('-d', '--database', type=str, choices = ['refseq', 'genbank'], default = 'refseq',
                     help = 'From which database references should be downloaded  (default: refseq)')
+parser.add_argument('-o', '--output_dir', type=str, required=True,
+                    help = 'Path of a directory where (intermediate) results will be saved')
 
 
 args = parser.parse_args()
