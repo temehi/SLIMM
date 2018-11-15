@@ -206,7 +206,7 @@ inline void slimm::analyze_alignments(BamFileIn & bam_file)
             append(read_name, ".1");
         else if(hasFlagLast(record))
             append(read_name, ".2");
-        
+
         // if there is no read with read_name this will create one.
         reads[read_name].add_target(record.rID, relative_bin_no);
         ++hits_count;
@@ -391,7 +391,7 @@ inline void slimm::filter_alignments()
     }
 }
 
-// get taxonomic profiles from the sam/bam 
+// get taxonomic profiles from the sam/bam
 inline void slimm::get_profiles()
 {
     Timer<>  stop_watch;
@@ -409,7 +409,7 @@ inline void slimm::get_profiles()
         avg_read_length = get_avg_read_length(bam_file, 100000);
 
         //if bin_width is not given use avg read length
-        if (options.bin_width == 0) 
+        if (options.bin_width == 0)
             options.bin_width = avg_read_length;
 
         //reset the bam_file to the first recored by closing and reopening
@@ -772,7 +772,7 @@ inline void slimm::write_abundance()
 
     std::unordered_map <uint32_t, float>    sum_abundunce_by_parent;
     std::unordered_map <uint32_t, uint32_t> sum_reads_count_by_parent;
-    
+
     for (auto t_id : taxon_id__read_count)
     {
         if (std::get<0>(db.taxid__name[t_id.first]) == rank)
@@ -890,12 +890,12 @@ inline void slimm::write_raw_stat()
                       "genome_length\t"
                       "uniq1_reads_count\t"
                       "uniq2_reads_count\t"
-  
+
                       "bins_count\t"
                       "bins_count(>0)\t"
                       "uniq1_bins_count(>0)\t"
                       "uniq2_bins_count(>0)\t"
-  
+
                       "coverage_depth\t"
                       "uniq1_coverage_depth\t"
                       "uniq2_coverage_depth\t"
@@ -919,17 +919,17 @@ inline void slimm::write_raw_stat()
                           << current_ref.length << "\t"
                           << current_ref.uniq_reads_count << "\t"
                           << current_ref.uniq_reads_count2 << "\t"
-  
+
                           << current_ref.cov.number_of_bins << "\t"
                           << current_ref.cov.none_zero_bin_count() << "\t"
                           << current_ref.uniq_cov.none_zero_bin_count() << "\t"
                           << current_ref.uniq_cov2.none_zero_bin_count() << "\t"
 
                           << current_ref.cov_depth() << "\t"
-  
+
                           << current_ref.uniq_cov_depth() << "\t"
                           << current_ref.uniq_cov_depth2() << "\t"
-  
+
                           << current_ref.cov_percent() << "\t"
                           << current_ref.uniq_cov_percent() << "\t"
                           << current_ref.uniq_cov_percent2() << "\n";
